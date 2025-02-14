@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+    var userId = Context.Session.GetString("UserId"); 
+}
+
+@if (!User.Identity.IsAuthenticated || string.IsNullOrEmpty(userId))
+{
+    <div class="container text-center">
+        <h1 class="display-4 text-primary">Welcome to Fresh Farm Market</h1>
+        <p class="lead text-muted mt-3">
+            Your one-stop destination for fresh produce, healthy groceries, and farm-fresh goodness delivered right to your doorstep.
+        </p>
+        <a class="btn btn-primary btn-lg mt-3" href="/Account/Register">Get Started</a>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+    <div class="row">
+        <!-- Left Column: Profile Picture -->
+        <div class="col-md-4 d-flex justify-content-center align-items-center">
+            <img src="@ViewData["PhotoPath"]" alt="Profile Picture"  style="max-width: 350px;">
+        </div>
+
+        <!-- Right Column: User Details -->
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="text-center">User Profile</h4>
+                </div>
+                <div class="card-body">
+                    <div class="profile-field">
+                        <label>Name</label>
+                        <span>@ViewData["FullName"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Email</label>
+                        <span>@ViewData["Email"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Gender</label>
+                        <span>@ViewData["Gender"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Mobile No</label>
+                        <span>@ViewData["MobileNo"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Delivery Address</label>
+                        <span>@ViewData["DeliveryAddress"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>Credit Card No</label>
+                        <span>@ViewData["CreditCardNo"]</span>
+                    </div>
+                    <div class="profile-field">
+                        <label>About Me</label>
+                        <span>@ViewData["AboutMe"]</span>
+                    </div>
+                    <div class="text-end mt-4">
+                        <a href="@Url.Action("ChangePassword", "Account")" class="btn btn-secondary">Change Password</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <style>
+        .profile-container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-picture {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .profile-picture img {
+                width: 150px;
+                height: 150px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #ddd;
+            }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .profile-field {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+            .profile-field label {
+                font-size: 14px;
+                color: #555;
+            }
+
+            .profile-field span {
+                font-size: 18px;
+                font-weight: bold;
+                color: #000;
+            }
+    </style>
+}
+
+
+

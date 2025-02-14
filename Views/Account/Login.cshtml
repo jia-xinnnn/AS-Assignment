@@ -1,0 +1,69 @@
+﻿@model _233506D.Models.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+<script src="https://www.google.com/recaptcha/api.js?render=@ViewBag.ReCaptchaSiteKey"></script>
+<script>
+    grecaptcha.ready(function () {
+        grecaptcha.execute('@ViewBag.ReCaptchaSiteKey', { action: 'submit' }).then(function (token) {
+            document.getElementById('RecaptchaToken').value = token;
+        });
+    });
+</script>
+<script nonce="@Context.Items["CSP-Nonce"]">
+    console.log("This script is safe from XSS attacks");
+</script>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="text-center">Login</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@Html.Encode(error.ErrorMessage)</li>
+                                }
+                            </div>
+                        }
+
+                        <input type="hidden" id="RecaptchaToken" name="RecaptchaToken" />
+                        @if (!string.IsNullOrEmpty(Html.Encode(ViewData["Require2FA"]?.ToString())))
+                        {
+                            <a asp-page="./Authentication" class="btn btn-success w-100">Setup Authenticator</a>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                                <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+                            </div>
+                            <a href="@Url.Action("ForgotPassword", "Account")" class="text-primary">Forgot Password?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

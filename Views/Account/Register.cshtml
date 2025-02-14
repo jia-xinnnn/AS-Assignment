@@ -1,0 +1,213 @@
+﻿@model _233506D.Models.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+<script nonce="@Context.Items["CSP-Nonce"]">
+    console.log("This script is safe from XSS attacks");
+</script>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Fresh Farm Market - Membership Registration</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <!-- Full Name -->
+                        <div class="form-group mb-3">
+                            <label asp-for="FullName" class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter your full name" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <!-- Credit Card Number -->
+                        <div class="form-group mb-3">
+                            <label asp-for="CreditCardNo" class="form-label">Credit Card Number</label>
+                            <input asp-for="CreditCardNo" type="password" class="form-control"
+                                   pattern="[0-9]{16}"
+                                   title="Credit Card Number must be exactly 16 digits."
+                                   maxlength="16"
+                                   inputmode="numeric"
+                                   onkeypress="return isNumberKey(event)"
+                                   oninput="validateCreditCard()" 
+                                   placeholder="Enter 16-digit credit card number" />
+                            <span asp-validation-for="CreditCardNo" class="text-danger"></span>
+                            <span id="credit-card-error" class="text-danger"></span>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Gender" class="form-label">Gender</label>
+                            <select asp-for="Gender" class="form-control">
+                                <option value="" selected disabled>Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Mobile Number -->
+                        <div class="form-group mb-3">
+                            <label asp-for="MobileNo" class="form-label">Mobile Number</label>
+                            <input asp-for="MobileNo" class="form-control" placeholder="Enter mobile number (8-15 digits)" />
+                            <span asp-validation-for="MobileNo" class="text-danger"></span>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="form-group mb-3">
+                            <label asp-for="DeliveryAddress" class="form-label">Delivery Address</label>
+                            <input asp-for="DeliveryAddress" class="form-control" placeholder="Enter your delivery address" />
+                            <span asp-validation-for="DeliveryAddress" class="text-danger"></span>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter your email (e.g., example@email.com)"
+                                   oninput="validateEmail()" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Password -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" id="Password" placeholder="Enter your password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <small id="password-strength" class="text-danger"></small>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                            <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm your password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+
+                        <!-- Photo Upload -->
+                        <div class="form-group mb-3">
+                            <label asp-for="Photo" class="form-label">Upload Photo (JPG Only)</label>
+                            <input asp-for="Photo" type="file" class="form-control" id="Photo"
+                                   data-val="true"
+                                   data-val-extension="Please upload a .jpg or .jpeg file"
+                                   data-val-extensions="jpg,jpeg,JPG,JPEG" />
+                            <span asp-validation-for="Photo" class="text-danger"></span>
+                            <span id="photo-error" class="text-danger"></span> 
+                        </div>
+
+                        <!-- About Me -->
+                        <div class="form-group mb-3">
+                            <label asp-for="AboutMe" class="form-label">About Me</label>
+                            <textarea asp-for="AboutMe" class="form-control" placeholder="Tell us about yourself"></textarea>
+                            <span asp-validation-for="AboutMe" class="text-danger"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fixed Password Strength Validation -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("Password").addEventListener("keyup", function () {
+            var password = this.value;
+            var strengthText = "";
+            var strengthColor = "text-danger";
+
+            if (password.length >= 12 &&
+                /[A-Z]/.test(password) &&
+                /[a-z]/.test(password) &&
+                /\d/.test(password) &&
+                /[@@$!%*#?&]/.test(password)) {
+                strengthText = "Strong password!";
+                strengthColor = "text-success";
+            } else {
+                strengthText = "Password must be at least 12 characters, include upper, lower, number, and special character.";
+            }
+
+            var strengthIndicator = document.getElementById("password-strength");
+            if (strengthIndicator) {
+                strengthIndicator.innerText = strengthText;
+                strengthIndicator.className = strengthColor;
+            }
+        });
+    });
+     document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("Photo").addEventListener("change", function () {
+                var file = this.files[0];
+                var errorSpan = document.getElementById("photo-error");
+
+                if (!file) {
+                    errorSpan.innerText = "";
+                    return;
+                }
+
+                var allowedExtensions = ["jpg", "JPG"];
+                var fileExtension = file.name.split('.').pop().toLowerCase();
+                var mimeType = file.type.toLowerCase();
+
+                if (!allowedExtensions.includes(fileExtension) || !mimeType.startsWith("image/")) {
+                    errorSpan.innerText = "Only JPG files are allowed.";
+                    this.value = ''; 
+                } else {
+                    errorSpan.innerText = ""; 
+                }
+                const maxSize = 2 * 1024 * 1024; // 2MB
+                if (file.size > maxSize) {
+                    alert("File size exceeds 2MB limit.");
+                    input.value = "";
+                    return;
+                }
+            });
+        });
+    function isNumberKey(evt) {
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        if (charCode < 48 || charCode > 57) { 
+            document.getElementById("credit-card-error").textContent = "Only numbers are allowed.";
+            return false; 
+        } else {
+            document.getElementById("credit-card-error").textContent = ""; 
+            return true;
+        }
+    }
+
+    function validateCreditCard() {
+        var input = document.getElementById("CreditCardNo").value;
+        var errorSpan = document.getElementById("credit-card-error");
+
+        if (!/^\d{16}$/.test(input)) { 
+            errorSpan.textContent = "Credit Card Number must be exactly 16 digits.";
+        } else {
+            errorSpan.textContent = ""; 
+        }
+    }
+    document.getElementById("Email").addEventListener("blur", function () {
+        var emailInput = this.value.trim();
+        var emailError = document.getElementById("email-error");
+        
+        var emailPattern = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        
+        if (!emailPattern.test(emailInput)) {
+            emailError.textContent = "Invalid email format. Example: example@email.com";
+        } else {
+            emailError.textContent = "";
+        }
+    });
+
+
+
+</script>
