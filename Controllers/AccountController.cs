@@ -69,7 +69,6 @@ namespace _233506D.Controllers
                     return View(model);
                 }
 
-                // Check if credit card number is exactly 16 digits
                 if (!Regex.IsMatch(model.CreditCardNo, @"^\d{16}$"))
                 {
                     ModelState.AddModelError("CreditCardNo", "Credit Card Number must be exactly 16 digits.");
@@ -213,8 +212,8 @@ namespace _233506D.Controllers
                     return RedirectToAction("VerifyOTP");
                 }
 
-                var passwordExpiryDays = 90; 
-                if (user.LastPasswordChangeDate == null || (DateTime.UtcNow - user.LastPasswordChangeDate.Value).TotalDays > passwordExpiryDays)
+                var passwordExpiryMinutes = 30; 
+                if (user.LastPasswordChangeDate == null || (DateTime.UtcNow - user.LastPasswordChangeDate.Value).TotalMinutes > passwordExpiryMinutes)
                 {
                     return RedirectToAction("ChangePassword");
                 }
@@ -442,11 +441,11 @@ namespace _233506D.Controllers
                 return NotFound("User not found.");
             }
 
-            var minPasswordAgeDays = 3;
-            if (user.LastPasswordChangeDate != null && (DateTime.UtcNow - user.LastPasswordChangeDate.Value).TotalDays < minPasswordAgeDays)
+            var minPasswordAgeMinutes = 5;
+            if (user.LastPasswordChangeDate != null && (DateTime.UtcNow - user.LastPasswordChangeDate.Value).TotalMinutes < minPasswordAgeMinutes)
             {
                 LogAudit(user.Id, "User denied password change request due to minimum age policy");
-                var nextAllowedChange = user.LastPasswordChangeDate.Value.AddDays(minPasswordAgeDays);
+                var nextAllowedChange = user.LastPasswordChangeDate.Value.AddDays(minPasswordAgeMinutes);
                 return RedirectToAction("PasswordChangeNotAllowed", new { nextChangeDate = nextAllowedChange });
             }
             return View();
@@ -619,6 +618,7 @@ namespace _233506D.Controllers
             ViewData["NextChangeDate"] = nextChangeDate.ToString("f");
             return View("~/Views/Error/PasswordChangeNotAllowed.cshtml");
         }
+
 
     }
 }
